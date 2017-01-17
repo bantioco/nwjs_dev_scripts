@@ -1,0 +1,40 @@
+<div class="append-data"></div>
+
+<script>
+(function( $ ){
+    $(document).ready(function(){
+         var fs = require('fs');
+        fs.open('data/data_scripts.json', 'r+', (err, fd) => {
+            if( err || fd == undefined ){
+                console.log(" No data")
+            }
+            else{
+                $.getJSON( 'data/data_scripts.json',function( getdata ){
+                    $.each( getdata.data, function( key, val ) {
+                        var bloc_list =
+                            "<div id='bloclist_" + key + "' class='bloc-list'>"+
+                                "<div class='bloc-list-icon'><i class='devicon-" +val.category+ "-plain colored'></i></div>"+
+                                "<div class='bloc-list-text'>"+
+                                    "<div class='bloc-list-title'>" + val.title + "</div>"+
+                                    "<div class='bloc-list-category'>" + val.category + "</div>"+
+                                "</div>"+
+                            "</div>";
+
+                        $('.append-data').prepend( bloc_list );
+                    });
+                });
+                setTimeout(function(){
+                    $('.bloc-list').on('click', function( e ){
+                        $('.bloc-list').removeClass('selected-list');
+                        $('.selected-list-view').remove();
+                        $(this).addClass('selected-list');
+                        $(this).append('<div class="selected-list-view"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></div>')
+                        $.post('./load/load_data.html', function( datadetail ){ $('.js-load-page').html( datadetail ); });
+                    })
+                },200);
+
+            }
+        });
+    });
+})( jQuery );
+</script>

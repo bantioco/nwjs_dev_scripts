@@ -1,0 +1,210 @@
+@font-face {
+  font-family: 'Abel';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Abel'), local('Abel-Regular'), url(fonts/Abel.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Abel",sans-serif;
+}
+.first-start {
+    position: relative;
+    color: #000;
+    padding: 10px 5px;
+}
+.first-start span{
+    font-size: 18px;
+    font-weight: bold;
+}
+div.bt-add {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    color: #2c3e50;
+    z-index: 999;
+    cursor: pointer;
+    z-index: 99999999;
+}
+.js-load-add-data {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    background-color: #FFF;
+    z-index: 9999;
+
+    display: none;
+}
+section.col-left {
+    position: fixed;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    top: 40px;
+    left: 0;
+    bottom: 0;
+    width: 25%;
+    border-right: 1px solid #2c3e50;
+    background-color: #2c3e50;
+}
+section.col-right {
+    float: right;
+    position: relative;
+    overflow: visible;
+    width: 74%;
+    min-height: 100%;
+}
+div.search {
+    position: fixed;
+    top:0;
+    left:0;
+    width: 25%;
+    text-align: center;
+    padding: 0;
+    z-index: 999;
+    border-right: 1px solid #2c3e50;
+}
+div.search input {
+    padding: 5px;
+    width: 100%;
+    min-height: 40px;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #2c3e50;
+    color: #2c3e50;
+    font-size: 14px;
+    font-family: "Abel",sans-serif;
+}
+
+
+div.bloc-list {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px dashed #34495e;
+    color: #FFF;
+    cursor: pointer;
+    padding-bottom: 10px;
+}
+div.bloc-list:hover {
+    opacity: 0.7;
+}
+.selected-list {
+    opacity: 0.3;
+}
+.selected-list-view {
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    width: 10px;
+    height: 10px;
+}
+div.bloc-list-icon {
+    float: left;
+    position:relative;
+    width: 20%;
+    margin:0;
+    padding-left: 10px;
+    padding-top: 13px;
+}
+div.bloc-list-icon i {
+    font-size: 25px;
+}
+
+
+div.bloc-list-text {
+    float:right;
+    position: relative;
+    width: 78%;
+    margin:0;
+    padding-top: 5px;
+}
+div.bloc-list-title {
+    position: relative;
+    font-size: 14px;
+}
+div.bloc-list-category {
+    position: relative;
+    font-size: 11px;
+}
+
+
+.data-bloc-title{
+    position: relative;
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    text-transform: capitalize;
+    padding-bottom: 5px;
+}
+.data-bloc-title-i {
+    float: left;
+    padding-top: 3px;
+}
+.data-bloc-title-s {
+    float: left;
+    padding-top: 0;
+    padding-left: 5px;
+}
+.bloc-data {
+    position: relative;
+    margin-right: 30px;
+}
+.bloc-data-topbar {
+    position: relative;
+    overflow: hidden;
+    background-color: #2c3e50;
+    margin:0;
+    color: #FFF;
+    padding:2px 10px;
+}
+.bloc-data-topbar-r {
+    float: right;
+    margin: 0 5px;
+    cursor: pointer;
+}
+.bloc-data-content {
+    position: relative;
+    border: 1px dotted #BABABA;
+}
+.bloc-data-confirm-delete {
+    display: none;
+    position: relative;
+    padding: 3px;
+    text-align: right;
+}
+
+.bloc-data-confirm-delete button {
+    margin-left: 5px;
+    text-align: center;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+.bloc-data-confirm-delete button.delete-confirm{
+    border: 1px solid red;
+    background-color: red;
+    color: #FFF;
+}
+
+.bloc-data-confirm-delete button.delete-cancel{
+    border: 1px solid #BABABA;
+    background-color: #BABABA;
+    color: #FFF;
+}
+
+pre code {
+    /*font-size: 12px;*/
+    font-family: "Abel",sans-serif;
+}
+
+
