@@ -2,17 +2,8 @@
     <h1>add_data</h1>
     <div>
         <form id="add_data">
-            <div class="bloc-input"><input type="text" id="add_data_title"></div>
-            <div class="bloc-input">
-                <select id="add_data_category">
-                    <option value="html5">html5</option>
-                    <option value="javascript">javascript</option>
-                    <option value="jquery">jquery</option>
-                    <option value="php">php</option>
-                    <option value="css3">css3</option>
-                    <option value="git">git</option>
-                </select>
-            </div>
+            <div class="bloc-input"><input type="text" id="add_data_title" placeholder="title"></div>
+            <div class="bloc-input load-category"></div>
             <div class="bloc-input">
                 <textarea id="add_data_text" cols="30" rows="10"></textarea>
             </div>
@@ -24,7 +15,30 @@
     (function( $ ){
         $(document).ready(function(){
 
-            CKEDITOR.replace( 'add_data_text' );
+            $.post('./load/load_category_select.html', function( datacategory ){
+                $('.load-category').html( datacategory );
+            });
+
+            tinymce.remove('textarea')
+            tinymce.init({
+                selector: '#add_data_text',
+                height: 300,
+                theme: 'modern',
+                menubar: false,
+                plugins: [
+                    'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                    'searchreplace wordcount visualblocks visualchars code fullscreen',
+                    'insertdatetime media nonbreaking save table contextmenu directionality',
+                    'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
+                ],
+                toolbar1: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | link | preview | forecolor backcolor emoticons | codesample',
+                toolbar2: '',
+                image_advtab: true,
+                templates: [
+                    { title: 'Test template 1', content: 'Test 1' },
+                    { title: 'Test template 2', content: 'Test 2' }
+                ]
+            });
 
             var fs = require('fs');
 

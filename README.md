@@ -1,1 +1,1 @@
-# nwjs_dev_scripts
+dev_script

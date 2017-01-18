@@ -3,10 +3,10 @@
 <script>
 (function( $ ){
     $(document).ready(function(){
-         var fs = require('fs');
+        var fs = require('fs');
         fs.open('data/data_scripts.json', 'r+', (err, fd) => {
             if( err || fd == undefined ){
-                console.log(" No data")
+                console.log(" No data");
             }
             else{
                 $.getJSON( 'data/data_scripts.json',function( getdata ){
@@ -19,7 +19,6 @@
                                     "<div class='bloc-list-category'>" + val.category + "</div>"+
                                 "</div>"+
                             "</div>";
-
                         $('.append-data').prepend( bloc_list );
                     });
                 });
@@ -32,7 +31,6 @@
                         $.post('./load/load_data.html', function( datadetail ){ $('.js-load-page').html( datadetail ); });
                     })
                 },200);
-
             }
         });
     });

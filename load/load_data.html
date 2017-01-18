@@ -10,12 +10,8 @@
         var fs = require('fs');
 
         fs.open('data/data_scripts.json', 'r+', (err, fd) => {
-            if( err || fd == undefined ){
-                file_not_exist();
-            }
-            else{
-                view_data();
-            }
+            if( err || fd == undefined ){ file_not_exist(); }
+            else{ view_data(); }
         });
 
         function view_data(){
@@ -42,37 +38,140 @@
             // Append bloc data function
             function append_bloc_data(key, val, getdata){
 
+                // Add var bloc title json object
                 var data_bloc_title =
-                    "<div class='data-bloc-title-i'><i class='devicon-" +val.category+ "-plain colored'></i></div> <div class='data-bloc-title-s'>" + val.title + "</div>";
+                    "<div class='data-bloc-title-i'>"+
+                        "<i class='devicon-" +val.category+ "-plain colored'></i>"+
+                    "</div>"+
+                    "<div class='data-bloc-title-s'>" + val.title + " <small>" + val.category + "</small></div>";
                 $('.data-bloc-title').html( data_bloc_title );
 
+                // Add var bloc data json object
                 var bloc_data =
                     "<div id='bloclist_" + key + "' class='bloc-data'>"+
-                        "<div class='bloc-data-topbar'>"+
-                            "<div class='bloc-data-topbar-r'><i class='fa fa-trash bt-bloc-delete' aria-hidden='true'></i></div>"+
-                            "<div class='bloc-data-topbar-r'><i class='fa fa-pencil' aria-hidden='true'></i></div>"+
-                        "</div>"+
-                        "<div id='deletebloc_" + key + "' class='bloc-data-confirm-delete'>"+
-                            "<span>Delete data ?</span> <button class='delete-confirm'>YES</button> <button class='delete-cancel'>NO</button>"+
-                        "</div>"+
-                        "<div class='bloc-data-content'>"+
-                            "<div class='bloc-data-category'>" + val.category + "</div>"+
-                            "<div class='bloc-data-text'>" + val.text + "</div>"+
-                        "</div>"+
+                        "<form id='edit_bloc_"+key+"'>"+
+                            "<div class='bloc-data-topbar'>"+
+                                "<div class='bloc-data-topbar-r'><i class='fa fa-trash bt-bloc-delete' aria-hidden='true'></i></div>"+
+                                "<div class='bloc-data-topbar-r'><i class='fa fa-pencil bt-bloc-edit' aria-hidden='true'></i></div>"+
+                            "</div>"+
+                            "<div id='deletebloc_" + key + "' class='bloc-data-confirm-delete'>"+
+                                "<span>Delete data ?</span> <button class='delete-confirm'>YES</button> <button class='delete-cancel'>NO</button>"+
+                            "</div>"+
+                            "<div class='bloc-data-content'>"+
+                                "<div class='bloc-data-title-edit'><input type='text' id='edit_title_"+key+"' value='"+val.title+"' /></div>"+
+                                 "<div class='bloc-data-category-edit'></div>"+
+                                "<div class='bloc-data-text'>" + val.text + "</div>"+
+                                "<div class='bloc-data-text-edit'>"+
+                                    "<textarea name='edit_text_"+key+"' id='edit_text_"+key+"'>" + val.text + "</textarea>"+
+                                "</div>"+
+                                "<div class='bloc-data-button-edit'><button type='submit' id='edit_button_"+key+"'>UPDATE</button></div>"+
+                            "</div>"+
+                        "</form>"+
                     "</div>";
                 $('.data-load-bloc').append( bloc_data );
 
+                // Add class line-numbers to pre
                 $('pre').addClass('line-numbers');
 
-                setTimeout(function(){ Prism.highlightAll(); },100);
+                // Edit bloc data
+                $('.bt-bloc-edit').on('click', function(){
 
+                    if( $('.bloc-data-title-edit').is(':hidden') ){
+                        $('.bloc-data-title-edit').show()
+                        $('.bloc-data-category').hide()
+                        $('.bloc-data-category-edit').show()
+                        $('.bloc-data-text').hide()
+                        $('.bloc-data-text-edit').show();
+
+                        tinymce.remove('textarea');
+                        tinymce.init({
+                            selector: 'textarea',
+                            height: 300,
+                            theme: 'modern',
+                            menubar: false,
+                            plugins: [
+                                'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                                'searchreplace wordcount visualblocks visualchars code fullscreen',
+                                'insertdatetime media nonbreaking save table contextmenu directionality',
+                                'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
+                            ],
+                            toolbar1: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | link | preview | forecolor backcolor emoticons | codesample',
+                            toolbar2: '',
+                            image_advtab: true,
+                            templates: [
+                                { title: 'Test template 1', content: 'Test 1' },
+                                { title: 'Test template 2', content: 'Test 2' }
+                            ]
+                        });
+                    }
+                    else{
+                        $('.bloc-data-title-edit').hide()
+                        $('.bloc-data-category').show()
+                        $('.bloc-data-category-edit').hide()
+                        $('.bloc-data-text').show()
+                        $('.bloc-data-text-edit').hide();
+
+                        tinymce.remove('textarea');
+                    }
+
+                    $.post('./load/load_category_select.html', function( editcategory ){
+                        $('.bloc-data-category-edit').html( editcategory );
+                        $('#add_data_category').prepend('<option value="'+val.category+'" selected>'+val.category+'</option>')
+                    });
+
+                    setTimeout(function(){
+
+                        $('.bloc-data-button-edit').show()
+
+                        $('#edit_bloc_'+key).on('submit', function(e){
+
+                            e.preventDefault();
+
+                            var edit_title      = $('#edit_title_'+key).val();
+                            var edit_category   = $('#add_data_category').val();
+                            var edit_text       = $('textarea#edit_text_'+key).val();
+
+                            $.getJSON( "data/data_scripts.json", function( datajson ){
+                                $.each( datajson.data, function( editkey, editval ) {
+                                    if(editkey == key){
+
+                                        editval.title       = edit_title;
+                                        editval.category    = edit_category;
+                                        editval.text        = edit_text;
+
+                                        setTimeout(function(){
+                                            fs.writeFile('data/data_scripts.json', JSON.stringify( datajson ), (err) => {
+                                                if (err) throw err;
+                                                console.log('It\'s saved!');
+                                                $.post('./load/load_data_list.html', function( datalist ){ $('.js-load-data-list').html( datalist ); });
+                                                $.post('./load/load_data.html', function( datadetail ){ $('.js-load-page').html( datadetail ); });
+                                            });
+                                        },500);
+                                    }
+                                });
+                            });
+                        });
+
+                    },500);
+                });
+
+                // Prism hightlight code
+                setTimeout(function(){
+                    Prism.highlightAll();
+                },100);
+
+                // Delete bloc data
                 setTimeout(function(){
                     $('.bt-bloc-delete').on('click', function(){
-                        var id0 = $(this).parent().parent().parent().attr('id'), id1 = id0.split('_'), id = id1[1];
+
+                        var id0 = $(this).parent().parent().parent().parent().attr('id'), id1 = id0.split('_'), id = id1[1];
+
                         if( $('#deletebloc_' + id).is(':hidden') ){
                             $('#deletebloc_' + id).slideDown(500);
                             $('.delete-cancel').on('click', function(){ $('#deletebloc_' + id).slideUp(500); });
-                            $('.delete-confirm').on('click', function(){
+
+                            $('.delete-confirm').on('click', function(e){
+                                e.preventDefault();
                                 getdata.data.splice(id,1);
                                 setTimeout(function(){
                                    fs.writeFile('data/data_scripts.json', JSON.stringify( getdata ), (err) => {
@@ -83,11 +182,10 @@
                                     });
                                 },500);
                             });
+
                         }
                         else{ $('#deletebloc_' + id).slideUp(500); }
                     });
-
-
                 },200);
             }
         }
