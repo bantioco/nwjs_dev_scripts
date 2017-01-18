@@ -23,13 +23,15 @@
                     });
                 });
                 setTimeout(function(){
+
                     $('.bloc-list').on('click', function( e ){
                         $('.bloc-list').removeClass('selected-list');
                         $('.selected-list-view').remove();
                         $(this).addClass('selected-list');
                         $(this).append('<div class="selected-list-view"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></div>')
                         $.post('./load/load_data.html', function( datadetail ){ $('.js-load-page').html( datadetail ); });
-                    })
+                    });
+
                 },200);
             }
         });

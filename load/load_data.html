@@ -9,6 +9,18 @@
 
         var fs = require('fs');
 
+        $('#add_data_bloc').remove();
+
+
+        $('.bt-add-data-close').css({
+            '-webkit-transform':'rotate(0deg)',
+            '-ms-transform':'rotate(0deg)',
+            'transform':'rotate(0deg)',
+            'color':'#2c3e50',
+            '-webkit-transition':'transform 0.5s, color 1s',
+            'transition':'transform 0.5s, color 1s'
+        }).removeClass('bt-add-data-close').addClass('bt-add-data');
+
         fs.open('data/data_scripts.json', 'r+', (err, fd) => {
             if( err || fd == undefined ){ file_not_exist(); }
             else{ view_data(); }
@@ -30,7 +42,16 @@
                 selected = 0;
                 $.getJSON( 'data/data_scripts.json',function( getdata ){
                     $.each( getdata.data, function( key, val ) {
-                        if(key == selected){ append_bloc_data(key, val, getdata); }
+                        if(key == selected){
+                            append_bloc_data(key, val, getdata);
+                            setTimeout(function(){
+                                $('.bloc-list').removeClass('selected-list');
+                                $('.selected-list-view').remove();
+                                $("#bloclist_0").addClass('selected-list');
+                                $("#bloclist_0").append('<div class="selected-list-view"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></div>')
+                            },500)
+
+                        }
                     });
                 });
             }

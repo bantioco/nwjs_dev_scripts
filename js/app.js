@@ -19,9 +19,7 @@ $(document).ready(function(){
         }).addClass('bt-add-data-close').removeClass('bt-add-data');
 
         $('body').on('click', '.bt-add-data-close', function(e){
-
             $('#add_data_bloc').remove();
-            //$('.js-load-add-data').hide(500);
             $(this).css({
                 '-webkit-transform':'rotate(0deg)',
                 '-ms-transform':'rotate(0deg)',
@@ -30,6 +28,9 @@ $(document).ready(function(){
                 '-webkit-transition':'transform 0.5s, color 1s',
                 'transition':'transform 0.5s, color 1s'
             }).removeClass('bt-add-data-close').addClass('bt-add-data');
+
+            load_data_details()
+
         });
     });
 

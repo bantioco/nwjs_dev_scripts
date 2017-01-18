@@ -32,6 +32,7 @@ div.bt-add {
     cursor: pointer;
     z-index: 99999999;
 }
+/*
 .js-load-add-data {
     position: relative;
     overflow: hidden;
@@ -44,9 +45,8 @@ div.bt-add {
     background-color: #FFF;
     z-index: 9999;
     display: none;
-
-    border: 1px dotted red;
 }
+*/
 #add_data_bloc {
     position: relative;
     margin-right: 10px;
@@ -61,20 +61,56 @@ div.bt-add {
     font-size: 14px;
     font-family: "Abel",sans-serif;
 }
+.bloc-data-title-edit {
+    position: relative;
+    /*margin-right: 10px;*/
+    /*padding-bottom: 20px;*/
+}
+.bloc-data-title-edit input {
+    border: 1px solid #BABABA;
+    width: 100%;
+    padding: 5px;
+    margin:0 0 5px 0;
+    min-height: 30px;
+    font-size: 14px;
+    font-family: "Abel", sans-serif;
+}
+.bloc-data-category-edit {
+
+}
+.bloc-data-category-edit select {
+    border: 1px solid #BABABA;
+    width: 100%;
+    padding: 5px;
+    margin:0 0 5px 0;
+    min-height: 30px;
+    font-size: 14px;
+    font-family: "Abel", sans-serif;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    background-color: #FFF;
+    cursor: pointer;
+    color: #BABABA;
+}
 .bloc-input select {
     border: 1px solid #BABABA;
     width: 100%;
     padding: 5px;
     margin:0 0 5px 0;
     min-height: 30px;
-
     font-size: 14px;
     font-family: "Abel",sans-serif;
-
+    -webkit-appearance: none;
+    -moz-appearance: none;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
-
+    background-color: #FFF;
+    cursor: pointer;
+    color: #BABABA;
 }
 .bloc-input textarea {
     margin-bottom: 20px;
