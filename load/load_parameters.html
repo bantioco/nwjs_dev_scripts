@@ -1,0 +1,58 @@
+
+<div class="data">
+    <div class="data-bloc-title">
+       <div class='data-bloc-title-i'>
+           <!--<i class='devicon-" +val.category+ "-plain colored'></i>-->
+       </div>
+       <div class='data-bloc-title-s'>Parameters<small>Configuration</small></div>
+
+    </div>
+    <div class="data-load-bloc">
+        <div id='blocdata_' class='bloc-data'>
+
+                <div class='bloc-data-date'>date</div>
+                <div class='parameters-tab bloc-data-topbar'>
+                    <div id="tabitem_git" class='parameters-tab-item tab-item-selected'>Git</div>
+                    <div id="tabitem_options" class='parameters-tab-item'>Options</div>
+                    <div id="tabitem_help" class='parameters-tab-item'>help</div>
+                </div>
+                <div class='bloc-data-content'>
+                    <div class='bloc-data-text'>
+                        <div>
+
+                            <div class="parameters-git">
+                                <div class="parameters-git-img"><img src="/img/github.png"/></div>
+                                <div class="parameters-git-form">
+                                    <div class="parameters-git-title">Github</div>
+
+                                    <div class="parameters-git-github-configure">
+                                    <div class="parameters-git-return-js"></div>
+                                    <div class="parameters-git-github-configure-title">Configure github for synchronize your data</div>
+                                        <form id="github_configure">
+                                            <div class="parameters-git-inp">
+                                                <input type="text" id="github_clone" name="github_clone" placeholder="Github clone https.." value="">
+                                                <div class="parameters-git-inp">
+                                                    <input type="text" id="github_username" name="github_username" placeholder="Username..." value="">
+                                                </div>
+                                                <div class="parameters-git-inp">
+                                                    <input type="password" id="github_password" name="github_password" placeholder="Password..." value="">
+                                                </div>
+                                            </div>
+                                            <div class="parameters-git-inp"><button class="parameters-git-inp-button" type="submit">Save</button></div>
+                                        </form>
+                                        <div class="parameters-github-action">
+                                        <button class="bt-github-pull">PULL</button> <button class="bt-github-push">PUSH</button>
+                                        </div>
+                                        <div class="parameters-git-github-configure-notice"><p>On github.com, create a new repo named "githubdata".. And enter the prameters..</p></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>$(document).ready(function(){ load_parameters_js(); });</script>

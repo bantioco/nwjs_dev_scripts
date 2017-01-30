@@ -1,32 +1,38 @@
 {
-    "name": "src_devscript",
-    "version": "0.0.1",
-    "description": "dev script",
-    "main": "index.html",
-    "node-remote": "https://*/*",
-    "window": {
-        "frame": true,
-        "toolbar": true,
-        "transparent": false,
-        "width": 950,
-        "height": 650,
-        "position": "mouse",
-        "min_width": 950,
-        "min_height": 650,
-        "icon": "icon/h20/icon-original.png"
-    },
-    "resizable": true,
-    "show_in_taskbar": true,
-    "visible_on_all_workspaces": true,
-    "chromium-args": "--disable-web-security",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "BANTIOCO",
-    "license": "MIT",
-    "dependencies": {
-        "devicon": "^2.0.0",
-        "fs": "0.0.1-security",
-        "fs-extra": "^2.0.0"
-    }
+  "name": "src_devscript",
+  "version": "0.0.1",
+  "description": "dev script",
+  "main": "index.html",
+  "node-remote": "https://*/*",
+  "window": {
+    "frame": true,
+    "toolbar": true,
+    "transparent": false,
+    "width": 950,
+    "height": 650,
+    "position": "mouse",
+    "min_width": 950,
+    "min_height": 650,
+    "icon": "icon/h20/icon-original.png"
+  },
+  "resizable": true,
+  "show_in_taskbar": true,
+  "visible_on_all_workspaces": true,
+  "chromium-args": "--disable-web-security",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BANTIOCO",
+  "license": "MIT",
+  "dependencies": {
+    "devicon": "^2.0.0",
+    "fs": "0.0.1-security",
+    "fs-extra": "^2.0.0",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-clean-css": "^2.3.2",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-uglifyjs": "^0.6.2",
+    "gulp-watch": "^4.3.11",
+    "shell_exec": "^1.0.3"
+  }
 }
