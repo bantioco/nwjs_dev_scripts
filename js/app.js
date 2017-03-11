@@ -2,7 +2,12 @@ $(document).ready(function(){
 
     var fs          = require('fs');
     var date_now    = getDate("y-m-d H:M:S");
-    var shell_exec = require('shell_exec').shell_exec;
+    var shell_exec  = require('shell_exec').shell_exec;
+
+    var navigator   = window.navigator;
+    var navigator_platform = navigator.platform;
+
+    console.log( navigator_platform )
 
     load_data_details();
     load_data_list();
@@ -25,20 +30,25 @@ $(document).ready(function(){
     // search data
     $('#data_search').on('keypress', function(e){
 
+        $('.append-data').html( "<div class='loading-search'>Searching..</div>" );
+
         var data_search = $(this).val();
 
         if(data_search.length == 1){
-            $.post('./load/load_search_result.html', function( dataresult ){ $('.js-load-data-list').html( dataresult ); });
+            $.post('./load/load_search_result.html', function( dataresult ){
+                $('.js-load-data-list').html( dataresult );
+            });
             $('.js-load-page').html("");
         }
-        if( data_search.length >= 3 ){
+        if( data_search.length >= 2 ){
 
             var results = [];
             $.getJSON( 'data/data_scripts.json',function( getdata ){
 
                 $.each( getdata.data, function( key, val ) {
-                    var valtext = val.text;
-                    var valtitle = val.title;
+
+                    var valtext     = val.text;
+                    var valtitle    = val.title;
 
                     if (valtext.indexOf( data_search ) >= 0 || valtitle.indexOf( data_search ) >= 0 ){
 
@@ -57,13 +67,9 @@ $(document).ready(function(){
 
                         var i = results.indexOf(bloc_list);
                         if(i != -1) { results.splice(i, 1); }
-
                         setTimeout(function(){ results.push( bloc_list ); },500);
-
                     }
                 });
-
-
             });
         }
         else if(data_search.length <= 1){
@@ -103,15 +109,21 @@ $(document).ready(function(){
     // BT add data
     $('body').on('click', '.bt-add-data', function(e){
         e.stopPropagation();
-
         load_add_data();
+    });
+    // Load add_data page
+    function load_add_data(){
+
+        $.post('./load/load_add_data.html', function( dataadd ){
+            $('.js-load-page').html( dataadd );
+        });
 
         // Remove nav list selected
         $('.bloc-list').removeClass('selected-list');
         $('.selected-list-view').remove();
 
         // Button add data effect
-        $(this).css({
+        $('.bt-add-data').css({
             '-webkit-transform':'rotate(45deg)',
             '-ms-transform':'rotate(45deg)',
             'transform':'rotate(45deg)',
@@ -119,9 +131,11 @@ $(document).ready(function(){
             '-webkit-transition':'transform 0.5s, color 1s',
             'transition':'transform 0.5s, color 1s'
         }).addClass('bt-add-data-close').removeClass('bt-add-data');
+
         // Button add data close
         $('body').on('click', '.bt-add-data-close', function(e){
             $('#add_data_bloc').remove();
+
             $(this).css({
                 '-webkit-transform':'rotate(0deg)',
                 '-ms-transform':'rotate(0deg)',
@@ -131,9 +145,7 @@ $(document).ready(function(){
                 'transition':'transform 0.5s, color 1s'
             }).removeClass('bt-add-data-close').addClass('bt-add-data');
         });
-    });
-    // Load add_data page
-    function load_add_data(){ $.post('./load/load_add_data.html', function( dataadd ){ $('.js-load-page').html( dataadd ); }); }
+    }
 
     // Parameters
     $('.js-bt-parameters').on('click', function(){
@@ -153,7 +165,6 @@ $(document).ready(function(){
     });
     // Load parameters page
     function load_parameters(){ $.post('./load/load_parameters.html', function( dataparameters ){ $('.js-load-page').html( dataparameters ); }); }
-
 
     // Data list nav
     window.load_data_list_js = function(){
@@ -320,12 +331,19 @@ $(document).ready(function(){
                 e.preventDefault();
                 //var form_post = new FormData( $(this)[0] );
 
+                $(this).hide();
+
                 // Get data form
                 var data_title      = $('#add_data_title').val();
                 var data_category   = $('#add_data_category').val();
-                var data_text       = $('#add_data_text').val();
-                var date_insert      = date_now;
+                var data_text      = $('#add_data_text').val();
+                //var data_text       = $(data_text_0).children().html();
 
+                //Replace tag php
+                data_text = data_text.replace("&lt;?","...");
+                data_text = data_text.replace("?&gt;","...");
+
+                var date_insert     = date_now;
 
                 // Controle lenght post data_title
                 if( data_title.length >= 1 ){
@@ -336,12 +354,19 @@ $(document).ready(function(){
                             fs.open('data/data_scripts.json', 'r+', function(err, fd){
                                 if( err || fd == undefined ){ create_file( data_title, data_category, data_text, date_insert ); }
                                 else{ add_data_in_file( data_title, data_category, data_text, date_insert ); }
+
+                                $(this).show();
                             });
                         }
                         // Notice lenght post data_text
                         else{
                             $('#add_data_text').val('required');
-                            setTimeout(function(){ $('#add_data_text').val(''); },1000);
+                            setTimeout(function(){
+                                $('#add_data_text').val('');
+                                $(this).show();
+                            },1000);
+
+
                         }
                     }
                     else{}
@@ -349,18 +374,27 @@ $(document).ready(function(){
                 // Notice lenght post data_title
                 else{
                     $('#add_data_title').val('required');
-                    setTimeout(function(){ $('#add_data_title').val(''); },1000);
+                    setTimeout(function(){
+                        $('#add_data_title').val('');
+                        $(this).show();
+                    },1000);
                 }
-
             });
 
             // Create file & add data
             function create_file( title, category, text, dateinsert ){
                 var json_data = { data: [ { title:title, category:category, text:text, dateinsert:dateinsert } ] };
                 fs.writeFile('data/data_scripts.json', JSON.stringify( json_data ), function(err) {
-                  if (err) throw err;
-                  console.log('It\'s saved!');
-                  $.post('./load/load_data_list.html', function( datalist ){ $('.js-load-data-list').html( datalist ); });
+                    if(err){
+                        throw err;
+                    }
+                    else{
+                        console.log('1-It\'s saved!');
+                        $.post('./load/load_data_list.html', function( datalist ){
+                            $('.js-load-data-list').html( datalist );
+                        });
+                        load_add_data();
+                    }
                 });
             }
 
@@ -369,9 +403,16 @@ $(document).ready(function(){
                 $.getJSON( 'data/data_scripts.json',function(getdata){
                     getdata.data.push( { title:title, category:category, text:text, dateinsert:dateinsert } );
                     fs.writeFile('data/data_scripts.json', JSON.stringify( getdata ), function(err) {
-                      if (err) throw err;
-                      console.log('It\'s saved!');
-                      $.post('./load/load_data_list.html', function( datalist ){ $('.js-load-data-list').html( datalist ); });
+                        if(err){
+                            throw err;
+                        }
+                        else{
+                            console.log('2-It\'s saved!');
+                            $.post('./load/load_data_list.html', function( datalist ){
+                                $('.js-load-data-list').html( datalist );
+                            });
+                            load_add_data();
+                        }
                     });
                 });
             }
@@ -381,10 +422,6 @@ $(document).ready(function(){
     // Load data
     window.load_data_js = function(){
         $('.data').fadeIn(500);
-
-        // variables
-        //var fs          = require('fs');
-        //var date_now    = getDate("y-m-d H:M:S");
 
         $('#add_data_bloc').remove();
 
@@ -451,6 +488,11 @@ $(document).ready(function(){
                     "<div class='data-bloc-title-s'>" + val.title + " <small>" + val.category + "</small></div>";
                 $('.data-bloc-title').html( data_bloc_title );
 
+                function htmlEntities(str) {
+                    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }
+
+
                 // Add var bloc data json object
                 var bloc_data =
                     "<div id='blocdata_" + key + "' class='bloc-data'>"+
@@ -468,7 +510,7 @@ $(document).ready(function(){
                                  "<div class='bloc-data-category-edit'></div>"+
                                 "<div class='bloc-data-text'>" + val.text + "</div>"+
                                 "<div class='bloc-data-text-edit'>"+
-                                    "<textarea name='edit_text_"+key+"' id='edit_text'>" + val.text + "</textarea>"+
+                                    "<textarea name='edit_text_"+key+"' id='edit_text_"+key+"'>" + htmlEntities(val.text) + "</textarea>"+
                                 "</div>"+
                                 "<div class='bloc-data-button-edit'><button type='submit' id='edit_button_"+key+"'>UPDATE</button></div>"+
                             "</div>"+
@@ -497,7 +539,7 @@ $(document).ready(function(){
 
                         tinymce.remove('textarea');
                         tinymce.init({
-                            selector: '#edit_text',
+                            selector: '#edit_text_'+key,
                             height: 300,
                             theme: 'modern',
                             menubar: false,
@@ -625,6 +667,7 @@ $(document).ready(function(){
                             toolbar2: '',
                             image_advtab: true
                         });
+
                     }
                     else{
                         $('.bloc-data-title-edit').hide()
@@ -644,11 +687,12 @@ $(document).ready(function(){
                     });
 
                     setTimeout(function(){
+
                         $('#edit_bloc_'+key).on('submit', function(e){
                             e.preventDefault();
                             var edit_title      = $('#edit_title_'+key).val();
                             var edit_category   = $('#add_data_category').val();
-                            var edit_text       = $('textarea#edit_text').val();
+                            var edit_text       = $('textarea#edit_text_'+key).val();
 
                             $.getJSON( "data/data_scripts.json", function( datajson ){
                                 $.each( datajson.data, function( editkey, editval ) {
@@ -681,16 +725,21 @@ $(document).ready(function(){
 
                 // Delete bloc data
                 setTimeout(function(){
-                    $('.bt-bloc-delete').on('click', function(){
+                    $('.bt-bloc-delete').on('click', function(e){
+                        e.preventDefault();
 
                         var id0 = $(this).parent().parent().parent().parent().attr('id'), id1 = id0.split('_'), id = id1[1];
 
                         if( $('#deletebloc_' + id).is(':hidden') ){
                             $('#deletebloc_' + id).slideDown(500);
-                            $('.delete-cancel').on('click', function(){ $('#deletebloc_' + id).slideUp(500); });
+                            $('.delete-cancel').on('click', function(d){
+                                d.preventDefault();
+                                $('#deletebloc_' + id).slideUp(500);
+                            });
 
-                            $('.delete-confirm').on('click', function(e){
-                                e.preventDefault();
+
+                            $('.delete-confirm').on('click', function(f){
+                                f.preventDefault();
                                 getdata.data.splice(id,1);
                                 setTimeout(function(){
                                    fs.writeFile('data/data_scripts.json', JSON.stringify( getdata ), function(err){
@@ -723,12 +772,59 @@ $(document).ready(function(){
         // Open file
         fs.open('parameters/parameters.json', 'r+', function(err, fd) {
             if( err || fd == undefined ){
-                console.log("file parameters not exist");
-                create_file_parameters();
+
+                if( navigator_platform === "MacIntel" || navigator_platform === "Mac68K" || navigator_platform === "MacPPC"  ){
+                    console.log("file parameters not exist");
+                    create_file_parameters();
+                }
+                else if( navigator_platform === "Win32" || navigator_platform === "Win16" || navigator_platform === "WinCE" ){
+                    $('.parameters-git').remove();
+                    $('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs, Pour le moment ! <b>Windows</b> bientôt disponible..</div>');
+                }
+                else if( navigator_platform === "Linux x86_64" || navigator_platform === "Linux i686" || navigator_platform === "Linux armv7l" ){
+
+                    //$('.parameters-git').remove();
+                    //$('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs, Pour le moment ! <b>Linux</b> bientôt disponible..</div>');
+
+                    //console.log("file parameters not exist");
+                    //create_file_parameters();
+
+                    create_file_parameters();
+
+                }
+                else{
+                    $('.parameters-git').remove();
+                    $('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs.. Pour le moment !</div>');
+                }
+
             }
             else{
-                console.log("file parameters exist");
-                view_file_parameters_github();
+                if( navigator_platform === "MacIntel" || navigator_platform === "Mac68K" || navigator_platform === "MacPPC"  ){
+                    console.log("file parameters not exist");
+                    macos_view_file_parameters_github();
+                }
+                else if( navigator_platform === "Win32" || navigator_platform === "Win16" || navigator_platform === "WinCE" ){
+                    $('.parameters-git').remove();
+                    $('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs, Pour le moment ! <b>Windows</b> bientôt disponible..</div>');
+                }
+                else if( navigator_platform === "Linux x86_64" || navigator_platform === "Linux i686" || navigator_platform === "Linux armv7l" ){
+
+                    /*
+
+                    $('.parameters-git').remove();
+                    $('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs, Pour le moment ! <b>Linux</b> bientôt disponible..</div>');
+
+                    */
+
+                    //console.log("file parameters not exist");
+                    //view_file_parameters_github();
+                    linux_view_file_parameters_github();
+
+                }
+                else{
+                    $('.parameters-git').remove();
+                    $('.parameters-return-js').html('<div>Seulement fonctionnel sur MacOs.. Pour le moment !</div>');
+                }
             }
         });
 
@@ -810,7 +906,58 @@ $(document).ready(function(){
                 setTimeout(function(){ $('#github_password').val(""); },2000)
             }
         });
+
+        //Show parameters github
+        $('#tabitem_git').on('click', function(e){
+
+            if( $('.parameters-git').is(':hidden') ){
+
+                $('.parameters-help').hide();
+                $('.parameters-options').hide();
+
+                $('.parameters-git').show(300);
+            }
+            parameters_tabitem_active( 'tabitem_git' );
+
+
+        });
+
+        //Show parameters options
+        $('#tabitem_options').on('click', function(e){
+
+            if( $('.parameters-options').is(':hidden') ){
+                $('.parameters-git').hide();
+                $('.parameters-help').hide();
+
+                $('.parameters-options').show(300);
+            }
+
+            parameters_tabitem_active( 'tabitem_options' );
+        });
+
+        //Show parameters help
+        $('#tabitem_help').on('click', function(e){
+
+            if( $('.parameters-help').is(':hidden') ){
+                $('.parameters-git').hide();
+                $('.parameters-options').hide();
+
+                $('.parameters-help').show(300);
+            }
+
+            parameters_tabitem_active( 'tabitem_help' );
+        });
+
+        function parameters_tabitem_active( item ){
+            $('.parameters-tab-item').removeClass('tab-item-selected');
+
+            $('#'+item).addClass('tab-item-selected');
+        }
     }
+
+    /*****************************************************
+        GITHUB
+    *****************************************************/
 
     // Create file & add data
     function create_file_parameters(){
@@ -832,14 +979,18 @@ $(document).ready(function(){
                 ]
             };
 
-        fs.writeFile('parameters/parameters.json', JSON.stringify( json_data_parameters ), function(err) {
-          if (err) throw err;
-          console.log('Github file parameters created..');
-          load_parameters();
-        });
+        var createfolderparameters = shell_exec('mkdir parameters/');
+        setTimeout(function(){
+            fs.writeFile('parameters/parameters.json', JSON.stringify( json_data_parameters ), function(err) {
+              if (err) throw err;
+              console.log('Github file parameters created..');
+              load_parameters();
+            });
+        },500);
     }
 
-    function view_file_parameters_github(){
+    // MacOS
+    function macos_view_file_parameters_github(){
 
         $('.parameters-git').show(300);
 
@@ -863,11 +1014,9 @@ $(document).ready(function(){
                         var passworddata    = val['github'][0].password;
                         view_file_parameters_configured(clonedata, usernamedata, passworddata);
 
-
-
                         setTimeout(function(){
 
-                            var gitstatus = shell_exec('cd data/githubdata && git status');
+                            var gitstatus = shell_exec('cd ./data/githubdata && git status');
                             console.log( gitstatus );
                             $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
 
@@ -876,61 +1025,99 @@ $(document).ready(function(){
 
                             var repo0 = clonedata.split('https://'), repo = repo0[1];
 
-                            $('.bt-github-pull').on('click',function(){
-                                var gitpull = shell_exec('cd data/githubdata && git pull');
+                            //GIT PULL
+                            $('.bt-github-pull').on('click',function( e ){
+
+                                e.preventDefault();
+
+                                $(this).hide();
+                                $('.bt-github-push').hide();
+
+                                var gitpull = shell_exec('cd ./data/githubdata && git pull');
                                 console.log( gitpull );
                                 $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git pull</h3>"+gitpull+"</div>" );
-                                var gitsave = shell_exec('cp data/data_scripts.json data/data_save/'+getDate('ymdHMS')+'_data_scripts.json');
+
+                                var gitsaverm = shell_exec('rm -rf ./data_save/*');
 
                                 setTimeout(function(){
-                                    var gitsync = shell_exec('cp data/githubdata/data_scripts.json data/');
+                                    var gitsave = shell_exec('cp ./data/data_scripts.json ./data_save/'+getDate('ymdHMS')+'_data_scripts.json');
                                 },1000);
+
+                                setTimeout(function(){
+                                    var gitsync = shell_exec('cp ./data/githubdata/data_scripts.json ./data/');
+
+                                    $('.bt-github-pull').show();
+                                    $('.bt-github-push').show();
+
+                                    // Load data list
+                                    load_data_list();
+
+                                },2000);
                             });
 
-                            $('.bt-github-push').on('click',function(){
+                            //GIT PUSH
+                            $('.bt-github-push').on('click',function( e ){
 
-                                var gitcopy = shell_exec('cp data/data_scripts.json data/githubdata/');
+                                e.preventDefault();
+
+                                $(this).hide();
+                                $('.bt-github-pull').hide();
+
+                                var gitcopy = shell_exec('cp ./data/data_scripts.json ./data/githubdata/');
                                 console.log( gitcopy );
 
-                                var gitstatus = shell_exec('cd data/githubdata && git status');
+                                var gitstatus = shell_exec('cd ./data/githubdata && git status');
                                 console.log( gitstatus );
 
                                 setTimeout(function(){
 
-                                    var gitstatus = shell_exec('cd data/githubdata && git status -s');
+                                    var gitstatus = shell_exec('cd ./data/githubdata && git status -s');
                                     console.log( gitstatus );
                                     $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status -s</h3>"+gitstatus+"</div>" );
-                                    //$('.parameters-git-return-js').html( "<div class='parameters-git-return-view'>"+gitstatus+"</div>" );
+
                                     // My local data is not commited
                                     if( gitstatus != ""){
 
                                         setTimeout(function(){
-                                            var gitadd = shell_exec('cd data/githubdata && git add data_scripts.json');
+                                            var gitadd = shell_exec('cd ./data/githubdata && git add data_scripts.json');
                                             console.log( gitadd );
                                             $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git add</h3>"+gitadd+"</div>" );
                                         },500);
 
                                         setTimeout(function(){
-                                            var gitcommit = shell_exec('cd data/githubdata && git commit -m "update_'+getDate('ymdHMS')+'"');
+                                            var gitcommit = shell_exec('cd ./data/githubdata && git commit -m "update_'+getDate('ymdHMS')+'"');
                                             console.log( gitcommit );
                                             $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git commit</h3>"+gitcommit+"</div>" );
                                         },1500);
 
                                         setTimeout(function(){
-                                            var gitpush = shell_exec('cd data/githubdata && git push https://'+usernamedata+':'+passworddata+'@'+repo);
+                                            var gitpush = shell_exec('cd ./data/githubdata && git push https://'+usernamedata+':'+passworddata+'@'+repo);
                                             console.log( gitpush );
                                         },2000);
 
                                         setTimeout(function(){
-                                            var gitstatus = shell_exec('cd data/githubdata && git status');
+                                            var gitstatus = shell_exec('cd ./data/githubdata && git status');
                                             console.log( gitstatus );
                                             $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
+
+                                            $('.bt-github-push').show();
+                                            $('.bt-github-pull').show();
+
+                                            // Load data list
+                                            load_data_list();
+
                                         },3000);
                                     }
                                     else{
-                                        var gitstatus = shell_exec('cd data/githubdata && git status');
+                                        var gitstatus = shell_exec('cd ./data/githubdata && git status');
                                         console.log( gitstatus );
                                         $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
+
+                                        $('.bt-github-push').show();
+                                        $('.bt-github-pull').show();
+
+                                        // Load data list
+                                        load_data_list();
                                         /*
                                         var gitstatus = shell_exec('cd data/githubdata && git pull');
                                         console.log( gitstatus );
@@ -944,11 +1131,6 @@ $(document).ready(function(){
                                     }
                                 },1000);
                             });
-
-
-
-
-
 
 
                             /*
@@ -981,7 +1163,156 @@ $(document).ready(function(){
                         },1000);
                     }
                     else{
-                        console.log("github error")
+                        console.log("github error");
+                        alert("github error");
+                    }
+                });
+            });
+        },500);
+    }
+    //Linux
+    function linux_view_file_parameters_github(){
+        $('.parameters-git').show(300);
+
+        setTimeout(function(){
+            $.getJSON( 'parameters/parameters.json',function(getparameters){
+
+                $.each( getparameters.parameters, function( key, val ) {
+
+                    var githubstatus = val['github'][0].status;
+                    if( githubstatus === "0" ){
+                        console.log("github null");
+                        $('.parameters-git').show(300);
+                    }
+                    else if( githubstatus === "1" ){
+                        console.log("github valid");
+
+                        $( '.parameters-git-inp-button' ).text( 'update' );
+                        $('.parameters-github-action').show();
+
+                        var clonedata       = val['github'][0].clone;
+                        var usernamedata    = val['github'][0].username;
+                        var passworddata    = val['github'][0].password;
+
+                        view_file_parameters_configured(clonedata, usernamedata, passworddata);
+
+                        setTimeout(function(){
+
+                            console.log( shell_exec( 'cd data/githubdata && ls -al' ) )
+
+                            var gitstatus = shell_exec('cd data/githubdata && git status');
+
+                            console.log( gitstatus );
+                            $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
+
+                            $('.parameters-git-github-configure-title').fadeOut(100);
+                            $('.parameters-git-github-configure-notice').fadeOut(100);
+
+                            var repo0 = clonedata.split('https://'), repo = repo0[1];
+
+                            //GIT PULL
+                            $('.bt-github-pull').on('click',function( e ){
+
+                                e.preventDefault();
+
+                                $(this).hide();
+                                $('.bt-github-push').hide();
+
+                                var gitpull = shell_exec('cd data/githubdata && git pull');
+                                console.log( gitpull );
+                                $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git pull</h3>"+gitpull+"</div>" );
+
+                                var gitsaverm = shell_exec('rm -rf data_save/*');
+
+                                setTimeout(function(){
+                                    var gitsave = shell_exec('cp data/data_scripts.json ./data_save/'+getDate('ymdHMS')+'_data_scripts.json');
+                                },1000);
+
+                                setTimeout(function(){
+                                    var gitsync = shell_exec('cp data/githubdata/data_scripts.json ./data/');
+
+                                    $('.bt-github-pull').show();
+                                    $('.bt-github-push').show();
+
+                                    // Load data list
+                                    load_data_list();
+
+                                },2000);
+                            });
+
+                            //GIT PUSH
+                            $('.bt-github-push').on('click',function( e ){
+
+                                e.preventDefault();
+
+                                $(this).hide();
+                                $('.bt-github-pull').hide();
+
+                                var gitcopy = shell_exec('cp ./data/data_scripts.json ./data/githubdata/');
+                                console.log( gitcopy );
+
+                                var gitstatus = shell_exec('cd ./data/githubdata && git status');
+                                console.log( gitstatus );
+
+                                setTimeout(function(){
+
+                                    var gitstatus = shell_exec('cd ./data/githubdata && git status -s');
+                                    console.log( gitstatus );
+                                    $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status -s</h3>"+gitstatus+"</div>" );
+
+                                    // My local data is not commited
+                                    if( gitstatus != ""){
+
+                                        setTimeout(function(){
+                                            var gitadd = shell_exec('cd ./data/githubdata && git add data_scripts.json');
+                                            console.log( gitadd );
+                                            $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git add</h3>"+gitadd+"</div>" );
+                                        },500);
+
+                                        setTimeout(function(){
+                                            var gitcommit = shell_exec('cd ./data/githubdata && git commit -m "update_'+getDate('ymdHMS')+'"');
+                                            console.log( gitcommit );
+                                            $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git commit</h3>"+gitcommit+"</div>" );
+                                        },1500);
+
+                                        setTimeout(function(){
+                                            var gitpush = shell_exec('cd ./data/githubdata && git push https://'+usernamedata+':'+passworddata+'@'+repo);
+                                            console.log( gitpush );
+                                        },2000);
+
+                                        setTimeout(function(){
+                                            var gitstatus = shell_exec('cd ./data/githubdata && git status');
+                                            console.log( gitstatus );
+                                            $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
+
+                                            $('.bt-github-push').show();
+                                            $('.bt-github-pull').show();
+
+                                            // Load data list
+                                            load_data_list();
+
+                                        },3000);
+                                    }
+                                    else{
+                                        var gitstatus = shell_exec('cd ./data/githubdata && git status');
+                                        console.log( gitstatus );
+                                        $('.parameters-git-return-js').html( "<div class='parameters-git-return-view'><h3>Git status</h3>"+gitstatus+"</div>" );
+
+                                        $('.bt-github-push').show();
+                                        $('.bt-github-pull').show();
+
+                                        // Load data list
+                                        load_data_list();
+
+                                    }
+                                },1000);
+                            });
+
+                        },1000);
+                    }
+                    else{
+                        console.log("github error");
+                        alert("github error");
                     }
                 });
             });
