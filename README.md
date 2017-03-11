@@ -2,6 +2,8 @@
 
 Memorise your dev script
 
+![alt text](screenshots/screenshot_2.png "View")
+
 ![alt text](screenshots/screenshot_1.png "View")
 
 ### Prerequisites
