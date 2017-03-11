@@ -1,7 +1,6 @@
 # DEVSCRIPT
 
-MacOs beta version..
-Memorise your dev script
+MacOs & Linux. Memorise your dev script
 
 ![alt text](screenshots/screenshot_2.png "View")
 
